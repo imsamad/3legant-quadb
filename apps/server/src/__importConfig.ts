@@ -1,7 +1,7 @@
 import fs from 'fs';
 
 const envFilePath =
-  false && process.env.NODE_ENV == 'production'
+  process.env.NODE_ENV == 'production'
     ? `/etc/secrets/.env`
     : `${process.cwd()}/.env`;
 

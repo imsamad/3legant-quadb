@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default ({ mode }) => {
+  console.log('process.env.NODE_ENV:', process.env.NODE_ENV);
   const temp = {
     proxy: {
       '/api': {
@@ -17,7 +18,7 @@ export default ({ mode }) => {
     base: '/',
     server: {
       port: 3000,
-      ...(mode == 'development' ? temp : {}),
+      ...(process.env.NODE_ENV == 'development' ? temp : {}),
     },
   });
 };
