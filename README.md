@@ -26,13 +26,13 @@ To quickly set up the project, use the following single command:
 It encompases all below steps just copy and throw it in terminal, and you will be good to go
 
 ```sh
-git clone git@github.com:imsamad/3legant && cd 3legant && docker compose up -d && npm i && npm run copy:env && npm run db:generate && npx turbo run build -F=@repo/* && npm run db:seed && npm run dev
+git clone git@github.com:imsamad/3legant-quadb && cd 3legant-quadb && docker compose up -d && npm i && npm run copy:env && npm run db:generate && npx turbo run build -F=@repo/* && npm run db:seed && npm run dev
 ```
 
 1. Clone the repository and install dependencies:
 
    ```sh
-   git clone https://github.com/imsamad/3legant && cd 3legant && npm install
+   git clone https://github.com/imsamad/3legant-quadb && cd 3legant-quadb && npm install
    ```
 
 2. Start MongoDB Instance. If you don’t have Docker installed, you can use a cloud instance.
