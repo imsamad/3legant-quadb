@@ -44,6 +44,7 @@ export let ProductForm = ({ product: product__ }: any) => {
           replace: true,
         });
       }
+
       handleShowToast('Product created');
     } catch (error) {
       handleShowToast('Please try again');
@@ -62,7 +63,9 @@ export let ProductForm = ({ product: product__ }: any) => {
     setMessage('');
     setShowToast(false);
   };
+
   const { data, isLoading } = useGetCategoriesQuery({});
+  console.log('useGetCategoriesQuery: ', data);
   return (
     <div className='my-8'>
       <p className='text-3xl text-center font-semibold'>Create Product</p>
@@ -302,6 +305,7 @@ export const ProductEditForm = () => {
   const { productId } = useParams();
 
   const { data, isLoading } = useGetProductDetailsQuery(productId);
+  console.log('ProductEditForm: ', data);
   if (isLoading) return null;
 
   return <ProductForm product={data.product} />;
