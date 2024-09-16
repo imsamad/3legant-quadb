@@ -1,0 +1,207 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model VerificationToken {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  token String
+
+  // this key identifier instead of userId is taken for the conformity reasons with PrismaAdapters.
+  identifier String   @unique @db.ObjectId
+  user       User     @relation(fields: [identifier], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model User {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  email       String  @unique
+  phoneNumber Int?
+  password    String
+  username    String
+  fullName    String
+  name        String?
+  image       String?
+
+  emailVerifiedAt       DateTime?
+  phoneNumberVerifiedAt DateTime?
+
+  blockedAt DateTime?
+
+  profile         Profile?
+  confirmationOTP VerificationToken?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  role EUserRole @default(USER)
+
+  products  Product[]
+  reviews   Review[]
+  orders    Order[]
+  addresses Address[]
+}
+
+enum EUserRole {
+  USER
+  ADMIN
+}
+
+model Product {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  title           String
+  description     String
+  price           Float
+  slug            String        @unique
+  quantityInStock Int
+  reviewsCount    Int           @default(0)
+  tableProps      TTableProps[]
+  medias          TMedia[]
+
+  reviews      Review[]
+  partOfOrders OrderItem[]
+
+  category Category @relation(fields: [categoryId] ,references: [id])
+  categoryId String  @db.ObjectId
+  userId    String         @db.ObjectId
+  user      User           @relation(fields: [userId], references: [id])
+  status    EProductStatus @default(DRAFT)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+}
+
+enum EProductStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model Review {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  rating  Int
+  comment String?
+
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id])
+
+  productId String  @db.ObjectId
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Order {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  items         OrderItem[]
+  totalPrice    Float
+  itemsPrice    Float
+  shippingPrice Float
+  taxPrice      Float
+
+  paymentMode     EPaymentMode
+  paidAt          DateTime?
+  paidJson        Json?
+  stripeSessionId String?
+
+  address Address
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  cancelledAt     DateTime?
+  outOfDeliveryAt DateTime?
+  deliveredAt     DateTime?
+
+  userId String? @db.ObjectId
+  user   User?   @relation(fields: [userId], references: [id],onDelete:SetNull)
+}
+
+enum EPaymentMode {
+  COD
+  ONLINE
+}
+
+model OrderItem {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  productId String?  @db.ObjectId
+  product   Product? @relation(fields: [productId], references: [id],onDelete:SetNull)
+
+  priceAtThatTime Float
+  quantity        Int
+
+  orderId String? @db.ObjectId
+  order   Order?  @relation(fields: [orderId], references: [id],onDelete:SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+type TTableProps {
+  key   String
+  value String
+}
+
+model Category {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  title String
+  products Product[]
+
+}
+
+type TMedia {
+  type      EMediaEnum
+  url       String
+  isDefault Boolean    @default(false)
+  orderNo   Int
+}
+
+enum EMediaEnum {
+  IMAGE
+  VIDEO
+  AUDIO
+}
+
+type ProductDimension {
+  weight Float
+  length Float
+  width  Float
+  height Float
+}
+
+model Profile {
+  // userId String @unique @db.ObjectId
+
+  // as the user authorised, profile entrt would be created immediately with id = user.id
+  // no extra userId field would be used, as User and Profile would have 1:1 mapping
+  user        User?         @relation(fields: [id], references: [id])
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  gender      Gender_Enum?
+  dateOfBirth DateTime?
+}
+
+enum Gender_Enum {
+  MALE
+  FEMALE
+}
+
+type Address {
+  isDefault Boolean @default(false)
+
+  firstName     String
+  lastName      String
+  streetAddress String
+  country       String
+  city          String
+  state         String
+  zipCode       String
+  phoneNumber   String
+  email         String
+  landmark      String?
+
+  longitude String?
+  latitude  String?
+}
